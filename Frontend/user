@@ -1,0 +1,58 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+function App() {
+  const [totalInvestment, setTotalInvestment] = useState(0);
+  const [portfolio, setPortfolio] = useState([]);
+
+  useEffect(() => {
+    // Fetch total investment
+    axios.get('/total_investment')
+      .then(response => {
+        setTotalInvestment(response.data);
+      });
+
+    // Fetch portfolio symbols and details
+    axios.get('/symbols')
+      .then(response => {
+        const symbols = response.data;
+        symbols.forEach(symbol => {
+          axios.get(`/symbols/${symbol}`)
+            .then(response => {
+              setPortfolio(prevPortfolio => [...prevPortfolio, response.data]);
+            });
+        });
+      });
+  }, []);
+
+  return (
+    <div>
+      <h1>Financial Portfolio</h1>
+      <h2>Total Investment: {totalInvestment}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Investment</th>
+            <th>Current Price</th>
+            <th>Value</th>
+            <th>ROI</th>
+          </tr>
+        </thead>
+        <tbody>
+          {portfolio.map((stock, index) => (
+            <tr key={index}>
+              <td>{stock.symbol}</td>
+              <td>{stock.investment}</td>
+              <td>{stock.current_price}</td>
+              <td>{stock.value}</td>
+              <td>{/* Fetch and add ROI here */}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default App;
