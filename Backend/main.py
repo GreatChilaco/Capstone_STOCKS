@@ -10,7 +10,7 @@ from decimal import Decimal
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 un = 'BACKEND'
 pw = 'Susannpaulina99'
@@ -83,7 +83,7 @@ API_KEY = "DAGLNQV2LIT0MB4U"
 def login():
     # Hardcoded user credentials (for demonstration purposes only)
     hardcoded_username = 'Juanca'
-    hardcoded_password = 'Susann'
+    hardcoded_password = '1234'
     
     # Getting the data from the request
     data = request.get_json()
