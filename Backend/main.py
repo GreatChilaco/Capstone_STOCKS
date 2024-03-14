@@ -86,16 +86,16 @@ def login():
     hardcoded_password = '1234'
     
     # Getting the data from the request
-    data = request.get_json()
+    data = requests.get_json()
     username = data.get('username')
     password = data.get('password')
     
-    # Check if the provided credentials match the hardcoded ones
+    
     if username == hardcoded_username and password == hardcoded_password:
-        # If they match, return a success message
+        
         return jsonify({"message": "Login successful"}), 200
     else:
-        # If not, return an error message
+        
         return jsonify({"error": "Invalid credentials"}), 401
 
 @app.route("/Portfolio", methods=["GET"])

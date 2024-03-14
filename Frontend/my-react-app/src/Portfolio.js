@@ -1,58 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './Portfolio.css'; // Ensure you have a CSS file for styling
 
 const Portfolio = () => {
-  const [Portfolio, setPortfolio] = useState({ total_investment: 0, roi: 0, stocks: [] });
-  const [selectedStock, setSelectedStock] = useState(null);
-  const [closingPrices, setClosingPrices] = useState([]);
+  const [portfolio, setPortfolio] = useState({
+    name: '',
+    total_investment: '',
+    roi: '',
+    stocks: []
+  });
 
   useEffect(() => {
+    // Fetch portfolio data when the component mounts
+    const fetchPortfolio = async () => {
+      try {
+        // Include the full URL if your backend is on a different port or domain
+        const response = await axios.get('http://127.0.0.1:5000/Portfolio');
+        setPortfolio(response.data); // Assuming the response has the data in the correct format
+      } catch (error) {
+        console.error('Error fetching portfolio data:', error);
+        // Handle errors as appropriate for your application
+      }
+    };
+
     fetchPortfolio();
   }, []);
 
-  const fetchPortfolio = async () => {
-    const response = await axios.get('/Portfolio');
-    setPortfolio(response.data);
-  };
-
-  const handleStockClick = async (ticker) => {
-    const response = await axios.get(`/${ticker}`);
-    setSelectedStock(ticker);
-    setClosingPrices(response.data.closing_prices);
-  };
-
+  // Render your component using the portfolio data
   return (
-    <div>
-      <h2>Total Investment: {Portfolio.total_investment}</h2>
-      <h2>ROI: {Portfolio.roi}%</h2> {/* If you have an overall ROI to display */}
+    <div className="portfolio-container">
+      <h2>{`'${portfolio.name}' 's Portfolio`}</h2>
+      <h2>Total Investment: {portfolio.total_investment}</h2>
+      <h2>ROI: {portfolio.roi}</h2>
       <table>
         <thead>
           <tr>
             <th>Stock Name</th>
+            <th>Shares</th>
+            <th>Purchase Price</th>
+            <th>Current Value</th>
+            <th>Portfolio Percentage</th>
             <th>Ticker</th>
-            <th>% of Portfolio</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {Portfolio.stocks.map((stock, index) => (
-            <tr key={index} onClick={() => handleStockClick(stock.symbol)}> {/* Use symbol for consistency */}
+          {portfolio.stocks.map((stock, index) => (
+            <tr key={index}>
               <td>{stock.name}</td>
+              <td>{stock.shares}</td>
+              <td>{`${stock.purchase_price}€`}</td>
+              <td>{`${stock.current_price}€`}</td>
+              <td>{`${stock.portfolio_percentage.toFixed(2)}%`}</td>
               <td>{stock.symbol}</td>
-              <td>{parseFloat(stock.Portfolio_percentage).toFixed(2)}%</td> {/* Format the percentage */}
+              <td><button className="remove" onClick={() => {/* handle remove stock */}}>Remove</button></td>
             </tr>
           ))}
         </tbody>
       </table>
-      {selectedStock && (
-        <div>
-          <h3>Closing Prices for {selectedStock} (Last 12 Months):</h3>
-          <ul>
-            {closingPrices.map((price, index) => (
-              <li key={index}>{price}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };
