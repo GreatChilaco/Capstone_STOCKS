@@ -21,11 +21,7 @@ pool = oracledb.create_pool(user=un, password=pw,
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'oracle+oracledb://{un}:{pw}@{dsn}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    'creator': pool.acquire,
-    'poolclass': NullPool
-}
-
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'creator': pool.acquire,'poolclass': NullPool}
 app.config['SQLALCHEMY_ECHO'] = True
 db.init_app(app)
 
@@ -83,8 +79,26 @@ API_KEY = "DAGLNQV2LIT0MB4U"
 #         })
 
 #     return jsonify({"total_investment": total_investment, "stocks": portfolio_data})
+@app.route("/login", methods=["POST"])
+def login():
+    # Hardcoded user credentials (for demonstration purposes only)
+    hardcoded_username = 'Juanca'
+    hardcoded_password = 'Susann'
+    
+    # Getting the data from the request
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    # Check if the provided credentials match the hardcoded ones
+    if username == hardcoded_username and password == hardcoded_password:
+        # If they match, return a success message
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        # If not, return an error message
+        return jsonify({"error": "Invalid credentials"}), 401
 
-@app.route("/portfolio", methods=["GET"])
+@app.route("/Portfolio", methods=["GET"])
 def get_portfolio():
     user = USERS.query.filter_by(name='user1').first()
     

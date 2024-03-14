@@ -1,15 +1,19 @@
-
 import React from 'react';
 import './App.css';
-import StockPortfolio from './Portfolio'; // Adjust the path based on your file structure
+import LandingPage from './LandingPage';
+import Portfolio from './Portfolio'; // Adjust the path if necessary
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
-    <div className="App">
-      <StockPortfolio />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage onLogin={() => console.log("CABBAGE")}/>} />
+        <Route path="/Portfolio" element={<Portfolio />} />
+        {/* Add more routes as needed */}
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
-

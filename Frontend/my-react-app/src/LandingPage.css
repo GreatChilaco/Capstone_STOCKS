@@ -1,0 +1,53 @@
+.login-container {
+    text-align: center;
+    margin-top: 50px;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .login-form {
+    margin: auto;
+    width: 300px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  }
+  
+  .login-form input[type="text"],
+  .login-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .login-form button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 4px;
+    background-color: #282c34;
+    color: white;
+    cursor: pointer;
+  }
+  
+  #register-btn {
+    background-color: #61dafb;
+    color: #282c34;
+  }
+  
+  .login-form button:hover {
+    opacity: 0.8;
+  }
+  
+  /* Styles for error message */
+  .login-error {
+    color: red;
+    margin-top: 10px; /* Adjust the spacing as needed */
+    font-size: 0.9rem; /* Adjust font size as needed */
+  }
+  

@@ -1,22 +1,45 @@
 import React, { useState } from 'react';
-import './LandingPage.css'; 
+import './LandingPage.css';
+import { useNavigate } from 'react-router-dom';
 
-const LandingPage = () => {
+const LandingPage = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate(); // Hook for navigation
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log('Login with:', username, password);
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setError(''); // Clear any previous errors
+    try {
+      const response = await fetch('http://127.0.0.1:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Login successful:', data);
+        onLogin(); // Update the login state in the App component
+        navigate('/Portfolio'); // Navigate to the portfolio route
+      } else {
+        const errorData = await response.text();
+        setError('Login failed: ' + errorData);
+      }
+    } catch (error) {
+      console.error('Login request failed:', error);
+      setError('Login request failed. Please try again.');
+    }
   };
 
-  const handleRegisterClick = () => {
-    console.log('Go to registration page');
-  };
-
+  // Rest of your component's JSX
   return (
     <div className="login-container">
-      <h1>Welcome to the Stock Tracker</h1>
+      <h1>Welcome to the STONKS</h1>
+      {error && <div className="login-error">{error}</div>} {/* Display error message if any */}
       <form className="login-form" onSubmit={handleLogin}>
         <input
           type="text"
@@ -35,9 +58,6 @@ const LandingPage = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button type="submit">LOGIN</button>
-        <button type="button" id="register-btn" onClick={handleRegisterClick}>
-          Register here
-        </button>
       </form>
     </div>
   );

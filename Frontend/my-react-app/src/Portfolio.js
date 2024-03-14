@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Portfolio = () => {
-  const [portfolio, setPortfolio] = useState({ total_investment: 0, roi: 0, stocks: [] });
+  const [Portfolio, setPortfolio] = useState({ total_investment: 0, roi: 0, stocks: [] });
   const [selectedStock, setSelectedStock] = useState(null);
   const [closingPrices, setClosingPrices] = useState([]);
 
@@ -11,7 +11,7 @@ const Portfolio = () => {
   }, []);
 
   const fetchPortfolio = async () => {
-    const response = await axios.get('/portfolio');
+    const response = await axios.get('/Portfolio');
     setPortfolio(response.data);
   };
 
@@ -23,8 +23,8 @@ const Portfolio = () => {
 
   return (
     <div>
-      <h2>Total Investment: {portfolio.total_investment}</h2>
-      <h2>ROI: {portfolio.roi}%</h2> {/* If you have an overall ROI to display */}
+      <h2>Total Investment: {Portfolio.total_investment}</h2>
+      <h2>ROI: {Portfolio.roi}%</h2> {/* If you have an overall ROI to display */}
       <table>
         <thead>
           <tr>
@@ -34,11 +34,11 @@ const Portfolio = () => {
           </tr>
         </thead>
         <tbody>
-          {portfolio.stocks.map((stock, index) => (
+          {Portfolio.stocks.map((stock, index) => (
             <tr key={index} onClick={() => handleStockClick(stock.symbol)}> {/* Use symbol for consistency */}
               <td>{stock.name}</td>
               <td>{stock.symbol}</td>
-              <td>{parseFloat(stock.portfolio_percentage).toFixed(2)}%</td> {/* Format the percentage */}
+              <td>{parseFloat(stock.Portfolio_percentage).toFixed(2)}%</td> {/* Format the percentage */}
             </tr>
           ))}
         </tbody>
