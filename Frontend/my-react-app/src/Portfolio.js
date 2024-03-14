@@ -11,12 +11,12 @@ const Portfolio = () => {
   }, []);
 
   const fetchPortfolio = async () => {
-    const response = await axios.get('https://mcsbt-integration-jcvlo.ew.r.appspot.com/portfolio');
+    const response = await axios.get('/portfolio');
     setPortfolio(response.data);
   };
 
   const handleStockClick = async (ticker) => {
-    const response = await axios.get(`https://mcsbt-integration-jcvlo.ew.r.appspot.com/${ticker}`);
+    const response = await axios.get(`/${ticker}`);
     setSelectedStock(ticker);
     setClosingPrices(response.data.closing_prices);
   };
@@ -24,7 +24,7 @@ const Portfolio = () => {
   return (
     <div>
       <h2>Total Investment: {portfolio.total_investment}</h2>
-      <h2>ROI: {portfolio.roi}%</h2>
+      <h2>ROI: {portfolio.roi}%</h2> {/* If you have an overall ROI to display */}
       <table>
         <thead>
           <tr>
@@ -35,10 +35,10 @@ const Portfolio = () => {
         </thead>
         <tbody>
           {portfolio.stocks.map((stock, index) => (
-            <tr key={index} onClick={() => handleStockClick(stock.ticker)}>
+            <tr key={index} onClick={() => handleStockClick(stock.symbol)}> {/* Use symbol for consistency */}
               <td>{stock.name}</td>
-              <td>{stock.ticker}</td>
-              <td>{stock['% of portfolio'].toFixed(2)}%</td>
+              <td>{stock.symbol}</td>
+              <td>{parseFloat(stock.portfolio_percentage).toFixed(2)}%</td> {/* Format the percentage */}
             </tr>
           ))}
         </tbody>
