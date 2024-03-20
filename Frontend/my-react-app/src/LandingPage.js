@@ -10,10 +10,10 @@ const LandingPage = ({ onLogin }) => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    setError(''); // Clear any previous errors
     try {
       const response = await fetch('http://127.0.0.1:5000/login', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -23,10 +23,13 @@ const LandingPage = ({ onLogin }) => {
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful:', data);
-        onLogin(); // Update the login state in the App component
+        //setUsername(data.username);
+        //onLogin(); // Update the login state in the App component
         navigate('/Portfolio'); // Navigate to the portfolio route
+        return data;
       } else {
         const errorData = await response.text();
+        console.log(errorData);
         setError('Login failed: ' + errorData);
       }
     } catch (error) {

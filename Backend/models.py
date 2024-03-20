@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Sequence
-from sqlalchemy.schema import Identity
 
 db = SQLAlchemy()
 
