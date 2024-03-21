@@ -51,7 +51,7 @@ const Portfolio = () => {
               <td>{stock.shares}</td>
               <td>{`${stock.purchase_price}€`}</td>
               <td>{`${stock.current_price}€`}</td>
-              <td>{`${stock.portfolio_percentage.toFixed(2)}%`}</td>
+              <td>{`${stock.portfolio_percentage}%`}</td>
               <td>{stock.symbol}</td>
               <td><button className="remove" onClick={() => {/* handle remove stock */}}>Remove</button></td>
             </tr>

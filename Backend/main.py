@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import requests
 from flask_cors import CORS
 from sqlalchemy.pool import NullPool
@@ -41,13 +41,15 @@ def login():
     # hardcoded_password = '1234'
     
     # Getting the data from the request
-    data = requests.get_json()
+    print("1")
+    data = request.get_json()
+    print("2")
     username = data['username']
     password = data['password']
-
+    print("3")
     user = USERS.query.filter_by(name=username).first()
-
-    if user and user.password == password:
+    print("4")
+    if user and user.hashed_password == password:
         return jsonify({"message": "Login successful"}), 200    
     #if username == hardcoded_username and password == hardcoded_password:
         
@@ -75,6 +77,7 @@ def get_portfolio():
         current_price = fetch_current_price(stock.symbol)  # Placeholder function for fetching current price
         stock_investment = stock.shares * current_price
         portfolio_percentage = (Decimal(stock_investment) / total_investment) * 100 
+        portfolio_percentage = round(portfolio_percentage, 2)
         roi = calculate_roi(stock.purchase_price, current_price)  # Placeholder for ROI calculation
 
         portfolio_data.append({

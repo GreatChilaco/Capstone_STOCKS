@@ -11,6 +11,7 @@ const LandingPage = ({ onLogin }) => {
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
+      console.log("hello")
       const response = await fetch('http://127.0.0.1:5000/login', {
         method: 'POST',
         credentials: 'include',
@@ -19,8 +20,9 @@ const LandingPage = ({ onLogin }) => {
         },
         body: JSON.stringify({ username, password }),
       });
-
+console.log("HELLO2")
       if (response.ok) {
+        console.log("HERE")
         const data = await response.json();
         console.log('Login successful:', data);
         //setUsername(data.username);
