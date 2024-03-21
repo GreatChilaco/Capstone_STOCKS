@@ -8,6 +8,7 @@ from models import USERS
 from models import STOCKS
 from decimal import Decimal
 import hashlib
+from flask import session
 
 #hashed_password_here
 
@@ -24,6 +25,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'oracle+oracledb://'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'creator': pool.acquire,'poolclass': NullPool}
 app.config['SQLALCHEMY_ECHO'] = False
+app.config['SECRET_KEY'] = 'supersecretkey'
 
 
 db.init_app(app)
@@ -36,27 +38,18 @@ API_KEY = "DAGLNQV2LIT0MB4U"
 
 @app.route("/login", methods=["POST"])
 def login():
-    # Hardcoded user credentials (for demonstration purposes only)
-    # hardcoded_username = 'Juanca'
-    # hardcoded_password = '1234'
-    
     # Getting the data from the request
-    print("1")
     data = request.get_json()
-    print("2")
     username = data['username']
     password = data['password']
-    print("3")
     user = USERS.query.filter_by(name=username).first()
-    print("4")
+
     if user and user.hashed_password == password:
-        return jsonify({"message": "Login successful"}), 200    
-    #if username == hardcoded_username and password == hardcoded_password:
-        
-    #    return jsonify({"message": "Login successful"}), 200
-    #else:
-        
-    #    return jsonify({"error": "Invalid credentials"}), 401
+        # Store the user's ID in the session
+        session['user_id'] = user.id
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        return jsonify({"error": "Invalid credentials"}), 401
 
 @app.route("/Portfolio", methods=["GET"])
 def get_portfolio():
@@ -97,10 +90,10 @@ def get_portfolio():
     })
 
 def fetch_current_price(symbol):
-    # Placeholder for fetching current price from an external API
-    # For example, using Alpha Vantage or another stock price API
-    # This function should return the current price of the stock
-    return 100.00  # Placeholder value
+    response = requests.get(f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={API_KEY}")
+    data = response.json()
+    current_price = float(data["Global Quote"]["05. price"])
+    return current_price
 
 def calculate_roi(purchase_price, current_price):
     # Convert float to Decimal for precise calculation
@@ -116,6 +109,44 @@ def get_historical_data(symbol):
     monthly_closes = list(data["Monthly Time Series"].values())[:12]
     closing_prices = [float(month["4. close"]) for month in monthly_closes]
     return jsonify({"symbol": symbol, "closing_prices": closing_prices})
+
+@app.route('/users/add_stock', methods=['POST'])
+def add_stock(user_id):
+    user_id = session.get('user_id')
+    data = request.json
+    symbol = data.get('symbol').upper()
+    shares = data.get('shares')
+    purchase_price = data.get('purchase_price')
+    api_key = API_KEY  # Replace with your actual API key
+
+    try:
+        # Optionally, fetch current stock price and company name from Alpha Vantage
+        response = requests.get(f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={api_key}")
+        global_quote = response.json().get('Global Quote', {})
+        current_price = float(global_quote.get('05. price', purchase_price))  # Fallback to purchase_price if not found
+        company_name = "Company Name"  # Placeholder, as company name might not be directly available from this API call
+
+        # Create and save the new stock object
+        new_stock = STOCKS(
+            user_id=user_id,
+            symbol=symbol,
+            shares=shares,
+            purchase_price=purchase_price
+        )
+        db.session.add(new_stock)
+        db.session.commit()
+
+        return jsonify({
+            "message": "Stock added successfully",
+            "stock": {
+                "name": company_name,
+                "symbol": symbol,
+                "current_price": current_price
+            }
+        }), 200
+    except Exception as e:
+        return jsonify({'error': 'Error processing your request', 'details': str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)

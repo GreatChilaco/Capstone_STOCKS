@@ -27,6 +27,52 @@ const Portfolio = () => {
   }, []);
 
   // Render your component using the portfolio data
+  const [newStock, setNewStock] = useState({
+    name: '',
+    quantity: '',
+    purchase_price: ''
+  });
+
+  const handleAddStock = async () => {
+    try {
+      const userId = sessionStorage.getItem('userId');
+      // Fetch stock data using the stock name
+      const response = await axios.post('/users/add_stock')
+      
+      const stockData = response.data['Global Quote'];
+
+      // Set the purchase price equal to the current price
+      const purchasePrice = parseFloat(stockData['05. price']);
+
+      // Create a new stock object with the fetched data and the purchase price
+      const newStockObject = {
+        user_id: userId,
+        name: stockData['01. symbol'],
+        shares: newStock.quantity,
+        purchase_price: purchasePrice,
+        current_price: purchasePrice,
+        portfolio_percentage: 0, // Calculate this value based on the total investment
+        symbol: stockData['01. symbol']
+      };
+
+      // Update the portfolio state by adding the new stock to the existing stocks array
+      setPortfolio(prevPortfolio => ({
+        ...prevPortfolio,
+        stocks: [...prevPortfolio.stocks, newStockObject]
+      }));
+
+      // Clear the input fields
+      setNewStock({
+        name: '',
+        quantity: '',
+        purchase_price: ''
+      });
+    } catch (error) {
+      console.error('Error fetching stock data:', error);
+      // Handle errors as appropriate for your application
+    }
+  };
+
   return (
     <div className="portfolio-container">
       <h2>{`'${portfolio.name}' 's Portfolio`}</h2>
@@ -58,6 +104,22 @@ const Portfolio = () => {
           ))}
         </tbody>
       </table>
+
+      <div className="add-stock-form">
+        <input
+          type="text"
+          placeholder="Stock Name"
+          value={newStock.name}
+          onChange={e => setNewStock(prevStock => ({ ...prevStock, name: e.target.value }))}
+        />
+        <input
+          type="number"
+          placeholder="Quantity"
+          value={newStock.quantity}
+          onChange={e => setNewStock(prevStock => ({ ...prevStock, quantity: e.target.value }))}
+        />
+        <button onClick={handleAddStock}>Add to Portfolio</button>
+      </div>
     </div>
   );
 };
