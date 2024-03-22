@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Sequence
+import bcrypt
+
 
 db = SQLAlchemy()
 
@@ -19,3 +21,12 @@ class STOCKS(db.Model):
     symbol = db.Column(db.String(10))
     shares = db.Column(db.Integer)
     purchase_price = db.Column(db.Numeric(10,2))
+
+
+def hash_password(password):
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    return hashed_password.decode('utf-8')
+
+def check_hashed_password(password, hashed_password):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+     
