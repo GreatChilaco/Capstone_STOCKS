@@ -9,6 +9,7 @@ from models import STOCKS
 from decimal import Decimal
 import hashlib
 from flask import session
+from sqlalchemy import Sequence
 
 #hashed_password_here
 
@@ -44,12 +45,42 @@ def login():
     password = data['password']
     user = USERS.query.filter_by(name=username).first()
 
-    if user and user.hashed_password == password:
+    hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    
+    if user  and user.hashed_password == hashed_password:
         # Store the user's ID in the session
         session['user_id'] = user.id
         return jsonify({"message": "Login successful"}), 200
     else:
         return jsonify({"error": "Invalid credentials"}), 401
+
+@app.route("/register", methods=["POST"])
+def register():
+    # Getting the data from the request
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+
+    # Check if the username already exists
+    existing_user = USERS.query.filter_by(name=username).first()
+    if existing_user:
+        return jsonify({"error": "Username already exists"}), 400
+
+    # Hash the password
+    hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    
+    sequence = db.session.execute(Sequence('USER_ID_SEQ'))
+    id = sequence.scalar()
+
+    # Create a new user object
+    new_user = USERS(name=username, hashed_password=hashed_password, id=id)
+
+    # Save the new user to the database
+    db.session.add(new_user)
+    db.session.commit()
+
+
+    return jsonify({"message": "Registration successful", "user_id": id}), 200
 
 @app.route("/Portfolio", methods=["GET"])
 def get_portfolio():
@@ -109,6 +140,20 @@ def get_historical_data(symbol):
     monthly_closes = list(data["Monthly Time Series"].values())[:12]
     closing_prices = [float(month["4. close"]) for month in monthly_closes]
     return jsonify({"symbol": symbol, "closing_prices": closing_prices})
+
+@app.route('/users/remove_stock/<int:stock_id>', methods=['DELETE'])
+def remove_stock(stock_id):
+    user_id = session.get('user_id')
+   
+    stock = STOCKS.query.filter_by(id=stock_id, user_id=user_id).first()
+    if not stock:
+        return jsonify({'error': 'Stock not found'}), 404
+
+    db.session.delete(stock)
+    db.session.commit()
+
+    return jsonify({'message': 'Stock removed successfully'}), 200
+
 
 @app.route('/users/add_stock', methods=['POST'])
 def add_stock(user_id):

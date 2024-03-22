@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Portfolio.css'; // Ensure you have a CSS file for styling
+import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
+
+
+
 
 const Portfolio = () => {
   const [portfolio, setPortfolio] = useState({
@@ -38,7 +42,7 @@ const Portfolio = () => {
       const userId = sessionStorage.getItem('userId');
       // Fetch stock data using the stock name
       const response = await axios.post('/users/add_stock')
-      
+
       const stockData = response.data['Global Quote'];
 
       // Set the purchase price equal to the current price
@@ -72,6 +76,9 @@ const Portfolio = () => {
       // Handle errors as appropriate for your application
     }
   };
+
+
+
 
   return (
     <div className="portfolio-container">

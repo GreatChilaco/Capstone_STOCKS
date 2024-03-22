@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './LandingPage.css';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const LandingPage = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -64,7 +65,10 @@ console.log("HELLO2")
         />
         <button type="submit">LOGIN</button>
       </form>
-    </div>
+      <div className="register-link">
+    Don't have an account? <Link to="/register">Register here</Link>
+  </div>
+</div>
   );
 };
 
